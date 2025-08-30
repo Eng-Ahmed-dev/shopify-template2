@@ -1,0 +1,72 @@
+<header>
+  <!-- Top Navigation for Desktop and Mobile -->
+  <nav class="hidden md:flex justify-between items-center bg-black">
+    <div class="flex gap-4 mx-10 my-3 text-white">
+      <a href="{{ routes.root_url }}">
+        {{ section.settings.text1 }}
+      </a>
+      <a href="{{ routes.collections_url }}">
+        {{ section.settings.text2 | upcase }}
+      </a>
+      <a href="{{ routes.contact_url }}">
+        {{ section.settings.text3 | upcase }}
+      </a>
+    </div>
+    <div class="flex items-center gap-4 px-10 text-white">
+      <button>{% render 'search-icon' %}</button>
+      {% if customer %}
+        <a href="{{ routes.account_url }}" class="h-7 w-7 rounded-full overflow-hidden flex items-center justify-center bg-gray-700 text-white">
+          {{ customer.first_name | slice: 0, 1 | upcase }}
+        </a>
+      {% else %}
+        <a href="{{ routes.account_login_url }}">{% render 'account-icon' %}</a>
+      {% endif %}
+      <button>{% render 'cart-icon' %}</button>
+      <!-- Cart slidout -->
+      <div class="abselute h-full w-1/4 bg-white"></div>
+    </div>
+  </nav>
+  <!-- Mobile Navigation -->
+  <nav class="flex justify-between py-10 bg-black md:hidden p-4">
+    <div class="flex items-center gap-4">
+      <button class="text-white">{% render 'menu' %}</button>
+      <button class="text-white">{% render 'search-icon' %}</button>
+    </div>
+    <div class="flex items-center gap-4 text-white">
+      {% if customer %}
+        <a href="{{ routes.account_url }}" class="h-8 w-8 rounded-full overflow-hidden flex items-center justify-center bg-gray-700 text-white">
+          {{ customer.first_name | slice: 0, 1 | upcase }}
+        </a>
+      {% else %}
+        <a href="{{ routes.account_login_url }}">{% render 'account-icon' %}</a>
+      {% endif %}
+      <button>{% render 'cart-icon' %}</button>
+    </div>
+  </nav>
+</header>
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    {
+      "type": "text",
+      "id": "text1",
+      "label": "Home Page ",
+      "default": "HOME"
+    },
+    {
+      "type": "text",
+      "id": "text2",
+      "label": "Collection Page ",
+      "default": "COLLECTIONS"
+    },
+    {
+      "type": "text",
+      "id": "text3",
+      "label": "Contact Page ",
+      "default": "CONTACT"
+    }
+  ]
+}
+{% endschema %}
