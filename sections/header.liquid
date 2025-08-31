@@ -1,7 +1,10 @@
 <header>
-  <!-- Top Navigation for Desktop and Mobile -->
-  <nav class="hidden md:flex justify-between items-center bg-black">
+
+
+  <!-- Top Navigation for Desktop  -->
+  <nav class="hidden md:flex justify-between items-center bg-black py-4">
     <div class="flex gap-4 mx-10 my-3 text-white">
+      <p>{{ shop.name  | escape }}</p>
       <a href="{{ routes.root_url }}">
         {{ section.settings.text1 }}
       </a>
@@ -13,7 +16,7 @@
       </a>
     </div>
     <div class="flex items-center gap-4 px-10 text-white">
-      <button>{% render 'search-icon' %}</button>
+      <button id="search-icon">{% render 'search-icon' %}</button>
       {% if customer %}
         <a href="{{ routes.account_url }}" class="h-7 w-7 rounded-full overflow-hidden flex items-center justify-center bg-gray-700 text-white">
           {{ customer.first_name | slice: 0, 1 | upcase }}
@@ -21,16 +24,160 @@
       {% else %}
         <a href="{{ routes.account_login_url }}">{% render 'account-icon' %}</a>
       {% endif %}
-      <button>{% render 'cart-icon' %}</button>
-      <!-- Cart slidout -->
-      <div class="abselute h-full w-1/4 bg-white"></div>
+      <button id="cart-icon">{% render 'cart-icon' %}</button>
+      
     </div>
   </nav>
-  <!-- Mobile Navigation -->
+<!--  overlay -->
+<div id="overlay" class="fixed bg-black/50 inset-0 pointer-events-none opacity-0 transition-opacity duration-300"></div>
+
+<!-- search slideout  -->
+<div id="search-bar" class="fixed top-0 right-0 left-0 h-26 bg-white translate-x-full transform transition-transform ease-in-out duration-300">
+  <button class="flex items-end close-search">
+    {% render 'x-icon' %}
+  </button>
+<div class="flex flex-row justify-center">
+  <form method="get" action="{{ routes.search_url }}">
+    <input 
+      type="search" 
+      name="q" 
+      placeholder="Search" 
+      class="border border-gray-300 p-2"
+    >
+    <button 
+      type="submit" 
+      class="inline p-2 bg-black text-white"
+    >
+      Search
+    </button>
+  </form>
+</div>
+
+</div>
+<!-- Cart slideout -->
+ <form action="{{ routes.cart_url }}" method="post">
+<aside id="cart-slider" class="bg-white shadow-2xl fixed top-0 bottom-0 right-0 translate-x-full w-[90%] md:w-1/2 lg:w-1/4  transform transition-transform duration-300">
+  
+    <div class="flex flex-col justify-between h-full p-4">
+
+      <div class="bg-gray-200 flex justify-between ">
+        <h2 class="text-2xl font-bold ">Your Cart</h2> 
+        <button id="cart-hider">{% render 'x-icon' %}</button>
+      </div>
+      {% if cart.item_count >0 %}
+        
+      
+      <div id="cart-items" class="py-4 grid overflow-y-auto">
+        <ul class="">
+         
+          {% for item in cart.items %}
+            <!-- Render each cart item -->
+            <li class="py-2 grid grid-cols-3 columns-3  gap-2 mb-4 border-b text-xs">
+              <div class="col-span-1">
+                <img src="{{ item.image | img_url: 'small' }}" alt="{{ item.title }}" loading="lazy">
+              </div>
+              <div class="flex flex-col gap-2">
+                <p class="">{{ item.product.title }}</p>
+                <div class="text-lg">
+                  <span>+</span> 
+                  <span class="text-xs border px-4 py-1 mx-1">{{ item.quantity }}</span> 
+                  <span class="text-2xl">-</span>
+                </div>
+                <p> {{ item.final_price | money }}</p>
+              </div>
+              <div>
+                {{ item.line_price | money }}
+              </div>
+             </li>
+          {% endfor %}
+        </ul>
+
+
+      </div>
+
+      <div>
+        <div class="bg-white py-4 w-full flex justify-between">
+          <p>total:</p> 
+          <p class="text-2xl font-bold"> {{ cart.total_price | money }}</p>
+        </div>
+        <button type="submit" class="text-white w-full py-4 text-lg bg-black">Cheackout</button>
+      </div>
+      {% else %}
+        <div class="flex flex-col items-center justify-center h-full">
+          <p class="text-2xl font-bold mb-4">Your cart is empty</p>
+          <a class="underline text-blue-400" href="{{ routes.collections_url }}"> shop now </a>
+        </div>
+      {% endif %}
+
+    </div>
+
+    
+</aside>  
+</form>
+<script>
+  // open and close cart slideout
+  let cartIcon = document.getElementById("cart-icon");
+  let cartSlider = document.getElementById("cart-slider");
+  let cartHider = document.getElementById("cart-hider");
+  letoverlay = document.getElementById("overlay");
+  function openCart() {
+    cartSlider.classList.remove("translate-x-full");
+    cartSlider.classList.add("translate-x-0");
+    overlay.classList.remove("pointer-events-none", "opacity-0");
+    overlay.classList.add("pointer-events-auto", "opacity-100");
+  }
+  function closeCart() {
+    cartSlider.classList.remove("translate-x-0");
+    cartSlider.classList.add("translate-x-full");
+    overlay.classList.remove("pointer-events-auto", "opacity-100");
+    overlay.classList.add("pointer-events-none", "opacity-0");
+  }
+  cartIcon.addEventListener("click", openCart);
+  cartHider.addEventListener("click", closeCart);
+  overlay.addEventListener("click", closeCart);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeCart();
+    }
+  });
+  // cart fuctionality and ajax
+  fetch
+
+
+</script>
+<script>
+let overlay = document.getElementById("overlay");
+let searchIcon = document.getElementById("search-icon");
+let closeSearchBtn = document.querySelector(".close-search");
+let searchBar = document.getElementById("search-bar");
+
+function openSearch() {
+overlay.classList.remove("pointer-events-none", "opacity-0");
+overlay.classList.add("pointer-events-auto", "opacity-100");
+searchBar.classList.remove("translate-x-full");
+}
+
+function closeSearch() {
+overlay.classList.remove("pointer-events-auto", "opacity-100");
+overlay.classList.add("pointer-events-none", "opacity-0");
+searchBar.classList.add("translate-x-full"); 
+}
+
+searchIcon.addEventListener("click", openSearch);
+overlay.addEventListener("click", closeSearch);
+closeSearchBtn.addEventListener("click", closeSearch);
+document.addEventListener("keydown", (e) => {
+if (e.key === "Escape") {
+closeSearch();
+}
+});
+</script>
+      
+  <!-- Mobile Navigation bar -->
   <nav class="flex justify-between py-10 bg-black md:hidden p-4">
     <div class="flex items-center gap-4">
-      <button class="text-white">{% render 'menu' %}</button>
-      <button class="text-white">{% render 'search-icon' %}</button>
+      <button id="side-menu" class="text-white">{% render 'menu' %}</button>
+      <button id="search-bar" class="text-white">{% render 'search-icon' %}</button>
     </div>
     <div class="flex items-center gap-4 text-white">
       {% if customer %}
@@ -40,9 +187,10 @@
       {% else %}
         <a href="{{ routes.account_login_url }}">{% render 'account-icon' %}</a>
       {% endif %}
-      <button>{% render 'cart-icon' %}</button>
+      <button id="cart-icon">{% render 'cart-icon' %}</button>
     </div>
   </nav>
+  {{ 'navigations.js' | asset_url | script_tag }}
 </header>
 
 {% schema %}
