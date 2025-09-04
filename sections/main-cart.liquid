@@ -44,7 +44,7 @@
               <!-- async reduce,add and remove then update the cart-->
               <div class="flex gap-4 qty-control">
                 <div class="border flex gap-2 px-3 py-2 border-gray-300">
-                  <input type="text" class="hidden" id="key" value="{{ item.key }}">
+                <input type="text" class="hidden" id="key" value="{{ item.key }}">
                   <button id="add-btn">+</button>
                   <input class="outline-none w-8 mx-2" type="number" id="item-qty" readonly min="1" value="{{ item.quantity }}">
                   <button id="reduce-btn">-</button>
@@ -155,7 +155,26 @@
     </div>
 
    <script>
+      document.querySelectorAll('.qty-control').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        console.log('itemQty')
+        const key = document.getElementById('key')
+        let cartQty = {{ cart.quantity }};
+        let itemQty = document.getElementById('item-qty').value;
+        
+        const addBtn = document.getAnimations('add-btn')
+        const removeBtn = document.getElementById('remove-btn')
+        const reduceBtn = document.getElementById('reduce-btn')
+          // update cart
+        const res = await fetch('/cart/change.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: key, quantity: itemQty })
+        });
+        const cart = await res.json();
 
+        });
+      })
     </script>
   </div>
   
