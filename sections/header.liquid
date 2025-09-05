@@ -29,7 +29,7 @@
     </div>
   </nav>
 <!--  overlay -->
-<div id="overlay" class="fixed bg-black/50 inset-0 pointer-events-none opacity-0 transition-opacity duration-300"></div>
+<div id="overlay" class="fixed bg-black/50 inset-0 pointer-events-none opacity-0 transition-opacity duration-300 z-99"></div>
 
 <!-- search slideout  -->
 <div id="search-bar" class="fixed top-0 right-0 left-0 h-26 bg-white translate-x-full transform transition-transform ease-in-out duration-300">
@@ -55,8 +55,8 @@
 
 </div>
 <!-- Cart slideout -->
- <form action="{{ routes.cart_url }}" method="post">
-<aside id="cart-slider" class="bg-white shadow-2xl fixed top-0 bottom-0 right-0 translate-x-full w-[90%] md:w-1/2 lg:w-1/4  transform transition-transform duration-300">
+
+<aside id="cart-slider" class="bg-white shadow-2xl fixed top-0 bottom-0 right-0 translate-x-full w-[90%] md:w-1/2 lg:w-1/4  transform transition-transform duration-300 z-100">
   
     <div class="flex flex-col justify-between h-full p-4">
 
@@ -64,52 +64,55 @@
         <h2 class="text-2xl font-bold ">Cart</h2> 
         <button id="cart-hider">{% render 'x-icon' %}</button>
       </div>
-      {% if cart.item_count >0 %}
-        
-      
-      <div id="cart-items" class="py-4 grid overflow-y-auto">
-        <ul class="">
-         
-          {% for item in cart.items %}
-            <!-- Render each cart item -->
-            <li class="py-2 grid grid-cols-3 columns-3  gap-2 mb-4 border-b text-xs">
-              <div class="col-span-1">
-                <img src="{{ item.image | img_url: 'small' }}" alt="{{ item.title }}" loading="lazy">
-              </div>
-              <div class="flex flex-col gap-2">
-                <p class="">{{ item.product.title }}</p>
-                <div class="flex items-center gap-4 ">
-                  <div class="flex items center text-lg">
-                    <span id="add">+</span> 
-                    <span class="text-xs border px-4 py-1 mx-1">{{ item.quantity }}</span> 
-                    <span id="remove" class="text-2xl">-</span>
+      {% if cart.item_count >0 %} 
+        <div class="py-4 grid overflow-y-auto">
+          <ul id="cart-items" class="">
+          
+            {% for item in cart.items %}
+              <!-- Render each cart item -->
+              <li class="py-2 grid grid-cols-3 columns-3  gap-2 mb-4 border-b text-xs product-card" data-id="{{ item.variant_id }}" >
+                <div class="col-span-1">
+                  <img src="{{ item.image | img_url: 'small' }}" alt="{{ item.title }}" loading="lazy">
+                </div>
+                <div class="flex flex-col gap-2">
+                  <p class="">{{ item.product.title }}</p>
+                    <!-- async reduce,add and remove then update the cart-->
+                  <div>
+                      <div class="flex gap-4 qty-control">
+                        <div class="border flex gap-2 px-3 py-2 border-gray-300">                
+                          <button class="add-btn cursor-pointer">+</button>
+                          <input class="item-qty outline-none w-8 mx-2" type="number" readonly min="1" value="{{ item.quantity }}">
+                          <button class="reduce-btn cursor-pointer">-</button>
+                        </div>
+                        <!-- remove item -->
+                        <button class="remove-btn cursor-pointer">
+                          🗑
+                        </button>
+                      </div>
+                      <div class="show-msg text-xs font-light py-1 px-2"></div>
+                    </div>
+                  
+                  <div class="flex text-gray-700 font-light">
+                    <p> {{ item.final_price | money }}</p>
+                    <p class="line-through"> {{ item.discount_allocations |  money }} </p>
                   </div>
-                  <button type="delete">{% render 'trach-can-icon' %}</button>
+                  
                 </div>
-        
-                <div class="flex text-gray-700 font-light">
-                  <p> {{ item.final_price | money }}</p>
-                  <p class="line-through"> {{ item.discount_allocations |  money }} </p>
+                <div>
+                  {{ item.line_price | money }}
                 </div>
-                
-              </div>
-              <div>
-                {{ item.line_price | money }}
-              </div>
-             </li>
-          {% endfor %}
-        </ul>
-
-
-      </div>
-
-      <div>
-        <div class="bg-white py-4 w-full flex justify-between">
-          <p>total:</p> 
-          <p class="text-2xl font-bold"> {{ cart.total_price | money }}</p>
+              </li>
+            {% endfor %}
+          </ul>
         </div>
-        <button type="submit" class="text-white w-full py-4 text-lg bg-black">Cheackout</button>
-      </div>
+
+        <div>
+          <div class="bg-white py-4 w-full flex justify-between">
+            <p>total:</p> 
+            <p class="text-2xl font-bold"> {{ cart.total_price | money }}</p>
+          </div>
+          <button type="submit" class="text-white w-full py-4 text-lg bg-black">Cheackout</button>
+       </div>
       {% else %}
         <div class="flex flex-col items-center justify-center h-full">
           <p class="text-2xl font-bold mb-4">Your cart is empty</p>
@@ -118,7 +121,7 @@
       {% endif %}
     </div>
 </aside>  
-</form>
+
 <script>
   // open and close cart slideout
   let cartIcon = document.getElementById("cart-icon");
@@ -151,32 +154,137 @@
 
 </script>
 <script>
-let overlay = document.getElementById("overlay");
-let searchIcon = document.getElementById("search-icon");
-let closeSearchBtn = document.querySelector(".close-search");
-let searchBar = document.getElementById("search-bar");
+    let overlay = document.getElementById("overlay");
+    let searchIcon = document.getElementById("search-icon");
+    let closeSearchBtn = document.querySelector(".close-search");
+    let searchBar = document.getElementById("search-bar");
 
-function openSearch() {
-overlay.classList.remove("pointer-events-none", "opacity-0");
-overlay.classList.add("pointer-events-auto", "opacity-100");
-searchBar.classList.remove("translate-x-full");
-}
+    function openSearch() {
+    overlay.classList.remove("pointer-events-none", "opacity-0");
+    overlay.classList.add("pointer-events-auto", "opacity-100");
+    searchBar.classList.remove("translate-x-full");
+    }
 
-function closeSearch() {
-overlay.classList.remove("pointer-events-auto", "opacity-100");
-overlay.classList.add("pointer-events-none", "opacity-0");
-searchBar.classList.add("translate-x-full"); 
-}
+    function closeSearch() {
+    overlay.classList.remove("pointer-events-auto", "opacity-100");
+    overlay.classList.add("pointer-events-none", "opacity-0");
+    searchBar.classList.add("translate-x-full"); 
+    }
 
-searchIcon.addEventListener("click", openSearch);
-overlay.addEventListener("click", closeSearch);
-closeSearchBtn.addEventListener("click", closeSearch);
-document.addEventListener("keydown", (e) => {
-if (e.key === "Escape") {
-closeSearch();
-}
-});
+    searchIcon.addEventListener("click", openSearch);
+    overlay.addEventListener("click", closeSearch);
+    closeSearchBtn.addEventListener("click", closeSearch);
+    document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+    closeSearch();
+    }
+    });
 </script>
+
+<script>
+            // Function to update a cart item in Shopify
+      async function updateCartElemnts(variantId, newQuantity) {
+        try {
+          const response = await fetch("/cart/change.js", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json"
+            },
+            body: JSON.stringify({
+              id: variantId,
+              quantity: newQuantity
+            }),
+            credentials: "same-origin" 
+          });
+
+          if (!response.ok) {
+            throw new Error(`Error updating cart: ${response.statusText}`);
+          }
+
+          const cartData = await response.json();
+          return cartData;
+
+        } catch (error) {
+          console.error("Cart update failed:", error);
+          return null;
+        }
+      }
+
+      // Event listener on the cart list
+      const lists = document.getElementById("cart-items");
+
+      lists.addEventListener("click", async (e) => {
+        if (e.target.matches(".add-btn")) {
+          const card = e.target.closest(".product-card");
+          const id = card.dataset.id;
+          let itemQty = parseInt(card.querySelector(".item-qty").value, 10) || 0;
+
+          itemQty += 1;
+          const cartData = await updateCartElemnts(id, itemQty);
+          if (cartData) {
+            card.querySelector(".item-qty").value = itemQty;
+            const lineItem = cartData.items.find(i => i.id === id);
+            if (lineItem) {
+              card.querySelector(".line-price").textContent = Shopify.formatMoney(lineItem.line_price);
+            }
+
+            card.querySelector('.show-msg').textContent  = 'added ✔'
+          }else{
+            alert("can't add more to cart")
+          }
+        }
+
+        if (e.target.matches(".reduce-btn")) {
+          const card = e.target.closest(".product-card");
+          const id = card.dataset.id;
+          let itemQty = parseInt(card.querySelector(".item-qty").value, 10) || 0;
+
+          if (itemQty > 1) {
+            itemQty --;
+            const cartData = await updateCartElemnts(id, itemQty);
+            if (cartData) {
+              card.querySelector(".item-qty").value = itemQty;
+
+              const lineItem = cartData.items.find(i => i.id === id);
+              if (lineItem) {
+                card.querySelector(".line-price").textContent = Shopify.formatMoney(lineItem.line_price);
+              }
+
+              card.querySelector('.show-msg').textContent  = 'Reduced ❌'
+              card.update()
+            }else{
+              alert("can't reduce the cart")
+            }
+            
+
+          } else {
+            // remove when reaching 0
+            const cartData = await updateCartElemnts(id, 0);
+            if (cartData) {
+              card.remove();
+              alert( "item removed" );
+              
+            }
+          }
+        }
+
+        if (e.target.matches(".remove-btn")) {
+          const card = e.target.closest(".product-card");
+          const id = card.dataset.id;
+
+          const cartData = await updateCartElemnts(id, 0);
+          if (cartData) {
+            card.remove();
+            
+            alert( "item removed" );
+          }else{
+            alert('failed to remove the item')
+          }
+        }
+      });
+            
+    </script>
       
   <!-- Mobile Navigation bar -->
   <nav class="flex justify-between py-10 bg-black md:hidden p-4">
