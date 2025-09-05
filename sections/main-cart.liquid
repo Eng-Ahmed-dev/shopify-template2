@@ -10,7 +10,7 @@
     <!--cart items-->
     <div class="flex flex-col md:flex-row justify-between my-4 gap-2 text-sm">
       <div class="w-full ">
-        <ul >  
+        <ul id="cart-list">  
           <li class="hidden md:grid grid-cols-4 items-center gap-4 py-4 border-gray-400 uppercase">
             <div class="">product</div>
            <div class="">details</div>
@@ -19,7 +19,7 @@
           </li>    
           {% for item in cart.items %}
             {% comment %} desktop version {% endcomment %}
-            <li class="hidden md:grid grid-cols-4 items-center gap-4 border-t border-gray-400">
+            <li class="product-card hidden md:grid grid-cols-4 items-center gap-4 border-t border-gray-400 " data-id="{{ item.variant_id }}">
               <!--product image-->
               <div>
                 <a href="{{ item.url }}">
@@ -42,19 +42,21 @@
                 </div>                
               </div>
               <!-- async reduce,add and remove then update the cart-->
-              <div class="flex gap-4 qty-control">
-                <div class="border flex gap-2 px-3 py-2 border-gray-300">
-                <input type="text" class="hidden" id="key" value="{{ item.key }}">
-                  <button id="add-btn">+</button>
-                  <input class="outline-none w-8 mx-2" type="number" id="item-qty" readonly min="1" value="{{ item.quantity }}">
-                  <button id="reduce-btn">-</button>
+               <div>
+                  <div class="flex gap-4 qty-control">
+                    <div class="border flex gap-2 px-3 py-2 border-gray-300">                
+                      <button class="add-btn cursor-pointer">+</button>
+                      <input class="item-qty outline-none w-8 mx-2" type="number" readonly min="1" value="{{ item.quantity }}">
+                      <button class="reduce-btn cursor-pointer">-</button>
+                    </div>
+                    <!-- remove item -->
+                    <button class="remove-btn cursor-pointer">
+                      🗑
+                    </button>
+                  </div>
+                  <div class="show-msg text-xs font-light py-1 px-2"></div>
                 </div>
 
-                <!-- remove item -->
-                <button id="remove-btn">
-                  <i>{% render 'trash-can-icon' %}</i>
-                </button>
-              </div>
               <div class="line-price"> {{ item.line_price | money }}</div>
             </li>
             <!-- mobile cart -->
@@ -154,27 +156,112 @@
       </div>
     </div>
 
-   <script>
-      document.querySelectorAll('.qty-control').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        console.log('itemQty')
-        const key = document.getElementById('key')
-        let cartQty = {{ cart.quantity }};
-        let itemQty = document.getElementById('item-qty').value;
-        
-        const addBtn = document.getAnimations('add-btn')
-        const removeBtn = document.getElementById('remove-btn')
-        const reduceBtn = document.getElementById('reduce-btn')
-          // update cart
-        const res = await fetch('/cart/change.js', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: key, quantity: itemQty })
-        });
-        const cart = await res.json();
+    <script>
+            // Function to update a cart item in Shopify
+      async function updateCartItem(variantId, newQuantity) {
+        try {
+          const response = await fetch("/cart/change.js", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json"
+            },
+            body: JSON.stringify({
+              id: variantId,
+              quantity: newQuantity
+            }),
+            credentials: "same-origin" 
+          });
 
-        });
-      })
+          if (!response.ok) {
+            throw new Error(`Error updating cart: ${response.statusText}`);
+          }
+
+          const cartData = await response.json();
+          return cartData;
+
+        } catch (error) {
+          console.error("Cart update failed:", error);
+          return null;
+        }
+      }
+
+      // Event listener on the cart list
+      const list = document.getElementById("cart-list");
+
+      list.addEventListener("click", async (e) => {
+        if (e.target.matches(".add-btn")) {
+          const card = e.target.closest(".product-card");
+          const id = card.dataset.id;
+          let itemQty = parseInt(card.querySelector(".item-qty").value, 10) || 0;
+
+          itemQty += 1;
+          const cartData = await updateCartItem(id, itemQty);
+          if (cartData) {
+            card.querySelector(".item-qty").value = itemQty;
+            const lineItem = cartData.items.find(i => i.id === id);
+            if (lineItem) {
+              card.querySelector(".line-price").textContent = Shopify.formatMoney(lineItem.line_price);
+               console.log(Shopify.formatMoney(lineItem.line_price));
+              
+            }
+
+            card.querySelector('.show-msg').textContent  = 'added ✔'
+          }else{
+            alert("can't add more to cart")
+          }
+        }
+
+        if (e.target.matches(".reduce-btn")) {
+          const card = e.target.closest(".product-card");
+          const id = card.dataset.id;
+          let itemQty = parseInt(card.querySelector(".item-qty").value, 10) || 0;
+
+          if (itemQty > 1) {
+            itemQty --;
+            const cartData = await updateCartItem(id, itemQty);
+            if (cartData) {
+              card.querySelector(".item-qty").value = itemQty;
+
+              const lineItem = cartData.items.find(i => i.id === id);
+              if (lineItem) {
+                card.querySelector(".line-price").textContent = Shopify.formatMoney(lineItem.line_price);
+                 console.log(Shopify.formatMoney(lineItem.line_price));
+              }
+
+              card.querySelector('.show-msg').textContent  = 'Reduced ❌'
+            
+            }else{
+              alert("can't reduce the cart")
+            }
+            
+
+          } else {
+            // remove when reaching 0
+            const cartData = await updateCartItem(id, 0);
+            if (cartData) {
+              card.remove();
+              alert( "item removed" );
+              
+            }
+          }
+        }
+
+        if (e.target.matches(".remove-btn")) {
+          const card = e.target.closest(".product-card");
+          const id = card.dataset.id;
+
+          const cartData = await updateCartItem(id, 0);
+          if (cartData) {
+            card.remove();
+            
+            alert( "item removed" );
+          }else{
+            alert('failed to remove the item')
+          }
+        }
+      });
+            
     </script>
   </div>
   
