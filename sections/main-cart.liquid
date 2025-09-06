@@ -102,22 +102,26 @@
             <i class="plus transition-opacity duration-300 ease-in-out">+</i>
             <i class="hidden transition-opacity duration-300 ease-in-out hidder">-</i>
           </div>
-          <div class="dropdown hidden  gap-2 justify-between items-center w-full  transition-opacity duration-300 ease-in-out">
-            <input type="text" placeholder="Discount code" class="border py-2 px-1 ">
-            <button class="text-white bg-black px-4 py-2  uppercase">apply</button>
-          </div>
+          <form action="/cart/discount" method="post" novalidate>
+              <div class="dropdown hidden  gap-2 justify-between items-center w-full  transition-opacity duration-300 ease-in-out">
+                <input type="text" placeholder="Discount code" class="border py-2 px-1 ">
+                <button  type="submit" class="text-white bg-black px-4 py-2  uppercase">apply</button>
+              </div>
+          </form>
         </div>
         <div class="flex flex-col gap-4 py-4 border-t border-gray-400">
             <div class="flex justify-between items-center">
               <p>Estimated total</p>
-              <p class="text-lg font-bold cart-total">{{ cart.total_price | money }}</p>
+              <p id="cart-total" class="text-lg font-bold cart-total">{{ cart.total_price | money }}</p>
             </div>
             <p class="text-gray-500 text-xs">Taxes and shipping calculated at checkout.</p>
         </div>
-        <div>
-          <button class=" w-full py-4  bg-black text-white uppercase">Check out</button>
-        </div>
-        
+        <form action="{{ routes.cart_url }}" method="POST" novalidate>
+          <div>
+            <button type="submit" name="checkout" class=" w-full py-4  bg-black text-white uppercase">Check out</button>
+            
+          </div>
+        </form>
 
 
         <!-- script for discount drop down  -->
@@ -202,11 +206,10 @@
             const lineItem = cartData.items.find(i => i.id === id);
             if (lineItem) {
               card.querySelector(".line-price").textContent = Shopify.formatMoney(lineItem.line_price);
-               console.log(Shopify.formatMoney(lineItem.line_price));
-              
             }
 
             card.querySelector('.show-msg').textContent  = 'added ✔'
+            console.log(cartData)
           }else{
             alert("can't add more to cart")
           }
@@ -226,11 +229,10 @@
               const lineItem = cartData.items.find(i => i.id === id);
               if (lineItem) {
                 card.querySelector(".line-price").textContent = Shopify.formatMoney(lineItem.line_price);
-                 console.log(Shopify.formatMoney(lineItem.line_price));
               }
 
               card.querySelector('.show-msg').textContent  = 'Reduced ❌'
-            
+              console.log(cartData)
             }else{
               alert("can't reduce the cart")
             }

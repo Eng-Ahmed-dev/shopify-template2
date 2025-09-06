@@ -2,9 +2,23 @@
   "sections": {
     "main": {
       "type": "index-section"
+    },
+    "featured-collection":{
+      "type": "featured-collection"
     }
+    ,
+    
+      "banner": {
+          "type": "hero"
+    
+      }
+      
+   
   },
   "order": [
-    "main"
+    "main",
+    "banner",
+    "featured-collection"
+    
   ]
 }

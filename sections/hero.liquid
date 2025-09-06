@@ -1,0 +1,59 @@
+<div class="hero-section my-3">
+  <div class=""></div>
+</div>
+
+{% schema %}
+{
+  "name": "hero",
+  "settings": [
+    {
+      "type": "text",
+      "id": "hero_title",
+      "label": "Hero title",
+      "default":"Welcome to our store"
+    },
+    {
+      "type": "text",
+      "id": "hero_description",
+      "label": "Hero descripton",
+      "default": "Unique products with unique EXPERIENCE! "
+    },
+    {
+      "type": "text",
+      "id":"url_text",
+      "label": "URL text",
+      "default": "Shopping now > "
+
+    },
+
+    {
+      "type": "url",
+      "id":"hero_url",
+      "label": "URL",
+      "default": "/collections"
+    },
+    {
+      "type": "select",
+      "id": "hero_media",
+      "label": "Hero media",
+      "options": [
+        { "value": "video", "label": "Video" },
+        { "value": "image", "label": "Image" }
+      ]
+    },
+    {
+      "type": "video",
+      "id": "hero_video",
+      "label": "Hero Video"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Hero Image"
+
+    }
+
+    
+    ]
+}
+{% endschema %}

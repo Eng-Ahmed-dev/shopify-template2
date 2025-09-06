@@ -32,7 +32,7 @@
 <div id="overlay" class="fixed bg-black/50 inset-0 pointer-events-none opacity-0 transition-opacity duration-300 z-99"></div>
 
 <!-- search slideout  -->
-<div id="search-bar" class="fixed top-0 right-0 left-0 h-26 bg-white translate-x-full transform transition-transform ease-in-out duration-300">
+<div id="search-bar" class="fixed z-100 top-0 right-0 left-0 h-26 bg-white translate-x-full transform transition-transform ease-in-out duration-300">
   <button class="flex items-end close-search">
     {% render 'x-icon' %}
   </button>
@@ -105,14 +105,17 @@
             {% endfor %}
           </ul>
         </div>
-
+          
         <div>
-          <div class="bg-white py-4 w-full flex justify-between">
-            <p>total:</p> 
-            <p class="text-2xl font-bold"> {{ cart.total_price | money }}</p>
-          </div>
-          <button type="submit" class="text-white w-full py-4 text-lg bg-black">Cheackout</button>
+          <form action="{{ routes.cart_url }}" method="POST" novalidate>
+              <div class="bg-white py-4 w-full flex justify-between">
+                <p>total:</p> 
+                <p class="text-2xl font-bold"> {{ cart.total_price | money }}</p>
+              </div>
+              <button type="submit" name="checkout" class="text-white w-full py-4 text-lg bg-black cursor-pointer">Cheackout</button>
+          </form>         
        </div>
+       
       {% else %}
         <div class="flex flex-col items-center justify-center h-full">
           <p class="text-2xl font-bold mb-4">Your cart is empty</p>
