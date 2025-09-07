@@ -1,51 +1,44 @@
-<div class="h[80vh] w-full md:h-[60vh] overflow-hidden">
+<div class="h-[80vh] w-full md:h-[60vh] overflow-hidden mb-4">
   <div class="hero-section relative">
       {% case section.settings.hero_media %}
         {% when 'image' %}
           {% if section.settings.hero_image %}
-              <div class="h[80vh] w-full md:h-[60vh]">     
+              <div class="h-[80vh] w-full md:h-[60vh]">     
                 <img
                   loading="lazy" 
-                  src="{{ section.settings.hero_image|  img_url: 'master' }}" 
+                  src="{{ section.settings.hero_image | img_url: 'master' }}" 
                   alt="{{ section.settings.hero_title }}" 
                   class="h-full w-full object-cover">            
               </div>
           {% endif %}
         {% else %}      
-          <div class="h[80vh] w-full md:h-[60vh]">
+          <div class="h-[80vh] w-full md:h-[60vh]">
             {% if section.settings.hero_video %}
               {{ section.settings.hero_video | video_tag: autoplay: true, loop: true, muted: true, class: 'w-full h-full object-cover' }}
             {% endif %}
           </div>
       {% endcase %}
-      
-      
 
-
-      <div class="absolute inset-0 bg-black/20 ">
-      <div class="flex flex-col justify-center items-centers gap-2 py-2 px-4 md:py-10">
-        
-    
-        {% if section.settings.hero_title %}
-          <h1 class="text-white font-bold text-4xl">{{ section.settings.hero_title }} </h1>
-        {% endif %} 
-        {% if section.settings.hero_description %}
-          <p class="text-white font-medium">{{ section.settings.hero_description }}</p>
-        {% endif %}
-        {% if section.settings.url_text %}
-          <div class="my-3">
-            <a class="flex md:hidden bg-white text-black py-3 px-4 font-medium rounded-3xl" href="{{ section.settings.hero_url }}">
-              {{ section.settings.url_text }}
-            </a>      
-            <a class="hidden md:flex bg-white text-black py-3 rounded-3xl px-4 font-medium text-center  " href="{{ section.settings.hero_url }}">{{ section.settings.url_text }}</a>    
-          </div>
-            
-        {% endif %} 
+      <div class="absolute inset-0 bg-black/20 flex items-center justify-center">
+        <div class="flex flex-col items-center gap-4 text-center px-4">
+          {% if section.settings.hero_title %}
+            <h1 class="text-white font-bold text-4xl md:text-6xl">{{ section.settings.hero_title }}</h1>
+          {% endif %}
+          {% if section.settings.hero_description %}
+            <p class="text-white font-medium text-lg md:text-xl">{{ section.settings.hero_description }}</p>
+          {% endif %}
+          {% if section.settings.url_text %}
+            <div class="mt-4">
+              <a class="bg-white text-black py-3 px-6 font-medium rounded-3xl" href="{{ section.settings.hero_url }}">
+                {{ section.settings.url_text }}
+              </a>
+            </div>
+          {% endif %}
         </div>
       </div>
-
   </div>
 </div>
+
 
 
 {% schema %}
