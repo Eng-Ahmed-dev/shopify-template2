@@ -60,36 +60,7 @@
               <div class="line-price"> {{ item.line_price | money }}</div>
             </li>
             <!-- mobile cart -->
-            <li class="py-2 grid grid-cols-3 columns-3  gap-2 mb-4 border-t border-gray-400 text-xs md:hidden ">
-              <div class="col-span-1">
-                <img src="{{ item.image | img_url: 'small' }}" alt="{{ item.title }}" loading="lazy">
-              </div>
-              <div class="flex flex-col gap-2">
-                <p class="">{{ item.product.title }}</p>
-                <!--quantity-->
-                <div class="flex gap-4">
-                  <div class="border flex gap-2 px-3 py-2 border-gray-300">
-                    <button class="qty-btn" data-key="{{ item.key }}" data-change="1">+</button>
-                    <span id="qty-{{ item.key }}">{{ item.quantity }}</span>
-                    <button class="qty-btn" data-key="{{ item.key }}" data-change="-1">-</button>
-                  </div>
-
-                  <!-- remove item -->
-                  <a href="{{ item.url_to_remove }}">
-                    <i>{% render 'trash-can-icon' %}</i>
-                  </a>
-                </div>
-        
-                <div class="flex text-gray-700 font-light">
-                  <p> {{ item.final_price | money }}</p>
-                  <p class="line-through"> {{ item.discount_allocations |  money }} </p>
-                </div>
-                
-              </div>
-              <div>
-                {{ item.line_price | money }}
-              </div>
-             </li>                
+                       
           {% endfor %}
         </ul>
       </div>
