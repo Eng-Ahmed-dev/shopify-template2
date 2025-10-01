@@ -5,7 +5,7 @@
         <div class="flex justify-center items-center">
             <form action="{{ routes.search_url }}" method="get" class="border flex rounded">
                 <input type="search" name="q" placeholder="Search" value="{{ search.terms | escape }}"
-                    class="px-4 py-2 w-80 border-none"
+                    class="px-4 py-2 w-full md:w-80 border-none"
                 >
 
                 <button type="submit" class="bg-black hover:bg-gray-700 text-white border px-4">Search</button>

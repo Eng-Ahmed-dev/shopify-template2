@@ -16,7 +16,7 @@
       </a>
     </div>
     <div class="flex items-center gap-4 px-10 text-white">
-      <button id="search-icon">{% render 'search-icon' %}</button>
+      <button id="search-icon-desktop" class="cursor-pointer" >{% render 'search-icon' %}</button>
       {% if customer %}
         <a href="{{ routes.account_url }}" class="h-7 w-7 rounded-full overflow-hidden flex items-center justify-center bg-gray-700 text-white">
           {{ customer.first_name | slice: 0, 1 | upcase }}
@@ -56,7 +56,7 @@
 </div>
 <!-- Cart slideout -->
 
-<aside id="cart-slider" class="bg-white shadow-2xl fixed top-0 bottom-0 right-0 translate-x-full w-[90%] md:w-1/2 lg:w-1/4  transform transition-transform duration-300 z-100">
+<aside id="cart-slider" class="mobile-cart-slidout bg-white shadow-2xl fixed top-0 bottom-0 right-0 translate-x-full w-[90%] md:w-1/2 lg:w-1/4  transform transition-transform duration-300 z-100">
   
     <div class="flex flex-col justify-between h-full p-4">
 
@@ -127,8 +127,8 @@
 <div id="mobile-overlay" class="fixed bg-black/50 inset-0 pointer-events-none opacity-0 transition-opacity duration-300 z-99"></div>
 
 <!-- the side mobile menu -->
-<aside id="mobile-dropleft" 
-  class="bg-white fixed top-0 left-0 bottom-0 w-[90%] translate-y-full md:hidden z-100 transition-transform duration-300">
+<aside id="mobile-ham-menu" 
+  class="bg-white fixed top-0 left-0 bottom-0 w-[90%] -translate-x-full md:hidden z-100 transition-transform duration-300">
   
   <button id="mobile-close" class="text-center items-center p-2">
     {% render 'x-icon' %}
@@ -139,15 +139,68 @@
     <a class="uppercase text-lg py-2 text-black" href="{{ routes.collections_url }}"> {{ section.settings.text2 }}</a>
     <a class="uppercase text-lg py-2 text-black" href="{{ section.settings.custom_id }}"> {{ section.settings.text3 }}</a>
   </div>
-</aside>  
+</aside> 
+</header>
 
 
 
+      
+{% comment %} mobile navigation {% endcomment %}
+  <nav class="flex justify-between py-10 bg-black md:hidden p-4">
+    <div class="flex items-center gap-4">
+      <button id="mobile-side" class="open-btn text-white items-center justify-center text-center cursor-pointer ">{% render 'menu' %}</button>
+      <button class="text-white search-bar"><a href="{{ routes.search_url }}">{% render 'search-icon' %}</a></button>
+    </div>
+    <div class="flex items-center gap-4 text-white">
+      {% if customer %}
+        <a href="{{ routes.account_url }}" class="h-8 w-8 rounded-full overflow-hidden flex items-center justify-center bg-gray-700 text-white">
+          {{ customer.first_name | slice: 0, 1 | upcase }}
+        </a>
+      {% else %}
+        <a href="{{ routes.account_login_url }}">{% render 'account-icon' %}</a>
+      {% endif %}
+      <button id="mobile-cart-icon">{% render 'cart-icon' %}</button>
+    </div>
+  </nav>
+  <script>
+    const mobOverlay = document.getElementById('mobile-overlay');
+    const closeBTN = document.getElementById('mobile-close');
+    const openBtn = document.getElementById('mobile-side');
+    const mobileMenu = document.getElementById('mobile-ham-menu');
 
+    function openMobileSide() {
+      mobileMenu.classList.remove("-translate-x-full");
+      
+      
+
+      mobOverlay.classList.remove("pointer-events-none", "opacity-0");
+      mobOverlay.classList.add("pointer-events-auto", "opacity-100");
+    }
+
+    function closeMobileSide() {
+
+      mobileMenu.classList.add("-translate-x-full");
+
+      mobOverlay.classList.remove("pointer-events-auto", "opacity-100");
+      mobOverlay.classList.add("pointer-events-none", "opacity-0");
+    }
+
+    openBtn.addEventListener("click", openMobileSide);
+    closeBTN.addEventListener("click", closeMobileSide);
+    mobOverlay.addEventListener("click", closeMobileSide);
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeMobileSide();
+      }
+    });
+  </script>
 
 <script>
   // open and close cart slideout
+  let mobileCartIcon = document.getElementById("mobile-cart-icon");
   let cartIcon = document.getElementById("cart-icon");
+  const mobileCartSlidout = document.querySelector(".mobile-cart-slidout")
   let cartSlider = document.getElementById("cart-slider");
   let cartHider = document.getElementById("cart-hider");
   let overlay = document.getElementById("overlay");
@@ -163,6 +216,7 @@
     overlay.classList.remove("pointer-events-auto", "opacity-100");
     overlay.classList.add("pointer-events-none", "opacity-0");
   }
+  mobileCartIcon.addEventListener("click", openCart);
   cartIcon.addEventListener("click", openCart);
   cartHider.addEventListener("click", closeCart);
   overlay.addEventListener("click", closeCart);
@@ -177,33 +231,40 @@
 
 </script>
 <script>
-    let overlay = document.getElementById("overlay");
-    let searchIcon = document.getElementById("search-icon");
-    let closeSearchBtn = document.querySelector(".close-search");
-    let searchBar = document.getElementById("search-bar");
+  let overlay = document.getElementById("overlay");
+  let searchBar = document.getElementById("search-bar");
+  let closeSearchBtn = document.querySelector(".close-search");
 
-    function openSearch() {
+  // Desktop search button
+  let searchIconDesktop = document.getElementById("search-icon-desktop");
+  // Mobile search button
+  let searchIconMobile = document.getElementById("search-icon-mobile");
+
+  function openSearch() {
     overlay.classList.remove("pointer-events-none", "opacity-0");
     overlay.classList.add("pointer-events-auto", "opacity-100");
     searchBar.classList.remove("translate-x-full");
-    }
+  }
 
-    function closeSearch() {
+  function closeSearch() {
     overlay.classList.remove("pointer-events-auto", "opacity-100");
     overlay.classList.add("pointer-events-none", "opacity-0");
-    searchBar.classList.add("translate-x-full"); 
-    }
+    searchBar.classList.add("translate-x-full");
+  }
 
-    searchIcon.addEventListener("click", openSearch);
-    overlay.addEventListener("click", closeSearch);
-    closeSearchBtn.addEventListener("click", closeSearch);
-    document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-    closeSearch();
-    }
-    });
+  // Bind events
+  if (searchIconDesktop) searchIconDesktop.addEventListener("click", openSearch);
+  if (searchIconMobile) searchIconMobile.addEventListener("click", openSearch);
+
+  overlay.addEventListener("click", closeSearch);
+  closeSearchBtn.addEventListener("click", closeSearch);
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeSearch();
+  });
+
 </script>
-
+<!---->
 <script>
             // Function to update a cart item in Shopify
       async function updateCartElemnts(variantId, newQuantity) {
@@ -305,61 +366,8 @@
             alert('failed to remove the item')
           }
         }
-      });
-            
-    </script>
-      
-
-  <nav class="flex justify-between py-10 bg-black md:hidden p-4">
-    <div class="flex items-center gap-4">
-      <button id="mobile-side" class="open-btn text-white items-center justify-center text-center cursor-pointer ">{% render 'menu' %}</button>
-      <button class="text-white search-bar"><a href="{{ routes.search_url }}">{% render 'search-icon' %}</a></button>
-    </div>
-    <div class="flex items-center gap-4 text-white">
-      {% if customer %}
-        <a href="{{ routes.account_url }}" class="h-8 w-8 rounded-full overflow-hidden flex items-center justify-center bg-gray-700 text-white">
-          {{ customer.first_name | slice: 0, 1 | upcase }}
-        </a>
-      {% else %}
-        <a href="{{ routes.account_login_url }}">{% render 'account-icon' %}</a>
-      {% endif %}
-      <button id="cart-icon">{% render 'cart-icon' %}</button>
-    </div>
-  </nav>
-  <script>
-  const mobOverlay = document.getElementById('mobile-overlay');
-  const closeBTN = document.getElementById('mobile-close');
-  const openBtn = document.getElementById('mobile-side');
-  const mobileMenu = document.getElementById('mobile-dropleft');
-
-  function openMobileSide() {
-    mobileMenu.classList.remove("translate-y-full");
-    
-    
-
-    mobOverlay.classList.remove("pointer-events-none", "opacity-0");
-    mobOverlay.classList.add("pointer-events-auto", "opacity-100");
-  }
-
-  function closeMobileSide() {
-
-    mobileMenu.classList.add("translate-y-full");
-
-    mobOverlay.classList.remove("pointer-events-auto", "opacity-100");
-    mobOverlay.classList.add("pointer-events-none", "opacity-0");
-  }
-
-  openBtn.addEventListener("click", openMobileSide);
-  closeBTN.addEventListener("click", closeMobileSide);
-  mobOverlay.addEventListener("click", closeMobileSide);
-
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      closeMobileSide();
-    }
-  });
+      });            
 </script>
-</header>
 
 {% schema %}
 {
